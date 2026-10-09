@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:ijustlikeordinary}",
+            "name": "Debug ijustlikeordinary",
+            "target": "ijustlikeordinary",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug ijustlikeordinary"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:ijustlikeordinary}",
+            "name": "Release ijustlikeordinary",
+            "target": "ijustlikeordinary",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release ijustlikeordinary"
+        }
+    ]
+}
