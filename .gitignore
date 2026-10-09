@@ -1,5 +1,6 @@
 .build/
 .swiftpm/
 iJustLikeOrdinary.app/
+*.zip
 .DS_Store
 
