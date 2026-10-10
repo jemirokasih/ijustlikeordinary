@@ -58,4 +58,11 @@ final class ijustlikeordinaryTests: XCTestCase {
         XCTAssertLessThanOrEqual(monitor.percentage, 100)
         XCTAssertFalse(monitor.formattedEstimate.isEmpty)
     }
+
+    func testBatteryHealthService() throws {
+        let health = BatteryHealthService.shared
+        XCTAssertGreaterThan(health.maximumCapacity, 0)
+        XCTAssertGreaterThanOrEqual(health.targetLimit, 70)
+        XCTAssertLessThanOrEqual(health.targetLimit, 100)
+    }
 }

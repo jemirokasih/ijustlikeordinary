@@ -4,6 +4,7 @@ import AppKit
 public struct MenuBarView: View {
     @ObservedObject var profileManager = ProfileManager.shared
     @ObservedObject var battery = BatteryMonitorService.shared
+    @ObservedObject var health = BatteryHealthService.shared
     @ObservedObject var powerMode = PowerModeService.shared
     @State private var showingSudoHelper = false
     @State private var copiedSudoCommand = false
@@ -83,6 +84,21 @@ public struct MenuBarView: View {
                     }
                 }
                 .frame(height: 4)
+
+                // Battery Longevity Info (Cycles & Max Health)
+                HStack {
+                    Text("Health: \(health.maximumCapacity)% • \(health.cycleCount) Cycles (\(health.condition))")
+                        .font(.system(size: 9))
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Button("Battery Settings") {
+                        health.openSystemBatterySettings()
+                    }
+                    .font(.system(size: 9))
+                    .buttonStyle(.plain)
+                    .foregroundColor(.accentColor)
+                }
+                .padding(.top, 2)
             }
             .padding(10)
             .background(Color.secondary.opacity(0.08))
@@ -252,6 +268,73 @@ public struct MenuBarView: View {
                 .frame(maxWidth: .infinity)
                 .background(Color.secondary.opacity(0.06))
                 .cornerRadius(6)
+            }
+
+            Divider()
+
+            // MARK: - Battery Longevity & Health Guard
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text("BATTERY HEALTH GUARD")
+                        .font(.system(size: 9, weight: .bold))
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    if health.isBatteryGuardEnabled {
+                        Text("Limit: \(health.targetLimit)%")
+                            .font(.system(size: 9, weight: .bold))
+                            .foregroundColor(.green)
+                    }
+                }
+
+                // Charge Limit Guard
+                HStack {
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text("Charge Limit Guard")
+                            .font(.system(size: 11, weight: .medium))
+                        Text("Avoids 100% high-voltage stress on AC power")
+                            .font(.system(size: 9))
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    Toggle("", isOn: $health.isBatteryGuardEnabled)
+                        .toggleStyle(.switch)
+                        .labelsHidden()
+                }
+
+                if health.isBatteryGuardEnabled {
+                    HStack(spacing: 4) {
+                        ForEach([75, 80, 85], id: \.self) { limit in
+                            let isSelected = health.targetLimit == limit
+                            Button(action: {
+                                health.targetLimit = limit
+                            }) {
+                                Text("\(limit)%")
+                                    .font(.system(size: 10, weight: isSelected ? .bold : .regular))
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 3)
+                                    .background(isSelected ? Color.accentColor : Color.secondary.opacity(0.12))
+                                    .foregroundColor(isSelected ? .white : .primary)
+                                    .cornerRadius(4)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+
+                // Cool Charging (Thermal Protection)
+                HStack {
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text("Cool Charging (Thermal Guard)")
+                            .font(.system(size: 11, weight: .medium))
+                        Text("Throttles CPU heat while charging to protect cells")
+                            .font(.system(size: 9))
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    Toggle("", isOn: $health.isThermalProtectionEnabled)
+                        .toggleStyle(.switch)
+                        .labelsHidden()
+                }
             }
 
             // MARK: - Low Power Mode Authorization Banner
