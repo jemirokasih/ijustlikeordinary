@@ -4,8 +4,11 @@ import Combine
 public final class ProfileManager: ObservableObject {
     public static let shared = ProfileManager()
 
+    private var isInitializing = true
+
     @Published public var isOrdinaryActive: Bool = false {
         didSet {
+            guard !isInitializing else { return }
             UserDefaults.standard.set(isOrdinaryActive, forKey: "isOrdinaryActive")
             applyCurrentSettings()
         }
@@ -14,15 +17,20 @@ public final class ProfileManager: ObservableObject {
     // 4 Core User-Controlled Sliders
     @Published public var processorLevel: Int = 0 {
         didSet {
+            guard !isInitializing else { return }
             UserDefaults.standard.set(processorLevel, forKey: "processorLevel")
             if isOrdinaryActive {
-                powerModeService.setProcessorLevel(processorLevel)
+                DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+                    guard let self = self else { return }
+                    self.powerModeService.setProcessorLevel(self.processorLevel)
+                }
             }
         }
     }
 
     @Published public var targetRefreshRate: Double = 60.0 {
         didSet {
+            guard !isInitializing else { return }
             UserDefaults.standard.set(targetRefreshRate, forKey: "targetRefreshRate")
             if isOrdinaryActive {
                 displayService.setRefreshRate(targetRefreshRate)
@@ -32,6 +40,7 @@ public final class ProfileManager: ObservableObject {
 
     @Published public var displayBrightness: Double = 0.40 {
         didSet {
+            guard !isInitializing else { return }
             UserDefaults.standard.set(displayBrightness, forKey: "displayBrightness")
             if isOrdinaryActive {
                 displayBrightnessService.setBrightness(Float(displayBrightness))
@@ -41,6 +50,7 @@ public final class ProfileManager: ObservableObject {
 
     @Published public var keyboardBrightness: Double = 0.0 {
         didSet {
+            guard !isInitializing else { return }
             UserDefaults.standard.set(keyboardBrightness, forKey: "keyboardBrightness")
             if isOrdinaryActive {
                 keyboardService.setBrightness(Float(keyboardBrightness))
@@ -91,8 +101,13 @@ public final class ProfileManager: ObservableObject {
         displayBrightnessService.captureOriginalBrightness()
         keyboardService.captureOriginalBrightness()
 
-        if isOrdinaryActive {
-            applyCurrentSettings()
+        self.isInitializing = false
+
+        // Defer applying settings until after SwiftUI app hierarchy is mounted
+        DispatchQueue.main.async { [weak self] in
+            if self?.isOrdinaryActive == true {
+                self?.applyCurrentSettings()
+            }
         }
     }
 
@@ -113,14 +128,21 @@ public final class ProfileManager: ObservableObject {
     }
 
     public func applyCurrentSettings() {
+        guard !isInitializing else { return }
+
         if isOrdinaryActive {
-            powerModeService.setProcessorLevel(processorLevel)
+            let pLevel = self.processorLevel
+            DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+                self?.powerModeService.setProcessorLevel(pLevel)
+            }
             displayService.setRefreshRate(targetRefreshRate)
             displayBrightnessService.setBrightness(Float(displayBrightness))
             keyboardService.setBrightness(Float(keyboardBrightness))
         } else {
             // Restore native hardware baselines
-            powerModeService.setProcessorLevel(3) // Normal
+            DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+                self?.powerModeService.setProcessorLevel(3) // Normal
+            }
             displayService.restoreOriginalRefreshRate()
             displayBrightnessService.restoreOriginalBrightness()
             keyboardService.restoreOriginalBrightness()
