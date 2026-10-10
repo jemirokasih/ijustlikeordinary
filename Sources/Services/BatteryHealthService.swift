@@ -179,3 +179,4 @@ public final class BatteryHealthService: ObservableObject {
         NSWorkspace.shared.open(url)
     }
 }
+
