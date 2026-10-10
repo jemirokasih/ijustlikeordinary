@@ -4,3 +4,4 @@ iJustLikeOrdinary.app/
 *.zip
 .DS_Store
 
+.tmp/
