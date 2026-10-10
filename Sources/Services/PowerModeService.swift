@@ -125,4 +125,14 @@ public final class PowerModeService: ObservableObject {
             return false
         }
     }
+
+    @discardableResult
+    public func setProcessorLevel(_ level: Int) -> Bool {
+        switch level {
+        case 0, 1: // Super Low & Low activate Low Power Mode
+            return setLowPowerMode(enabled: true)
+        default:   // Medium & Normal deactivate Low Power Mode
+            return setLowPowerMode(enabled: false)
+        }
+    }
 }

@@ -8,6 +8,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         DisplayService.shared.restoreOriginalRefreshRate()
+        DisplayBrightnessService.shared.restoreOriginalBrightness()
         KeyboardService.shared.restoreOriginalBrightness()
     }
 }

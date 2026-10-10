@@ -8,9 +8,10 @@ final class ijustlikeordinaryTests: XCTestCase {
 
         let typing = BatteryProfile.ordinaryTyping
         XCTAssertEqual(typing.name, "Ordinary Typing")
+        XCTAssertEqual(typing.processorLevel, 0)
         XCTAssertEqual(typing.targetRefreshRate, 60.0)
-        XCTAssertTrue(typing.enableLowPowerMode)
-        XCTAssertTrue(typing.turnOffKeyboardBacklight)
+        XCTAssertEqual(typing.displayBrightness, 0.40)
+        XCTAssertEqual(typing.keyboardBrightness, 0.0)
     }
 
     func testBatteryProfileCodable() throws {
@@ -18,9 +19,10 @@ final class ijustlikeordinaryTests: XCTestCase {
             name: "Custom Test",
             icon: "star",
             description: "Test description",
+            processorLevel: 1,
             targetRefreshRate: 50.0,
-            enableLowPowerMode: true,
-            turnOffKeyboardBacklight: false
+            displayBrightness: 0.50,
+            keyboardBrightness: 0.20
         )
 
         let encoder = JSONEncoder()
@@ -31,9 +33,10 @@ final class ijustlikeordinaryTests: XCTestCase {
 
         XCTAssertEqual(decoded.id, profile.id)
         XCTAssertEqual(decoded.name, profile.name)
+        XCTAssertEqual(decoded.processorLevel, 1)
         XCTAssertEqual(decoded.targetRefreshRate, 50.0)
-        XCTAssertTrue(decoded.enableLowPowerMode)
-        XCTAssertFalse(decoded.turnOffKeyboardBacklight)
+        XCTAssertEqual(decoded.displayBrightness, 0.50)
+        XCTAssertEqual(decoded.keyboardBrightness, 0.20)
     }
 
     func testDisplayServiceRates() throws {
@@ -42,11 +45,17 @@ final class ijustlikeordinaryTests: XCTestCase {
         XCTAssertGreaterThan(DisplayService.shared.currentRefreshRate, 0.0)
     }
 
-    func testBatteryMonitorReadsValues() throws {
+    func testDisplayBrightnessService() throws {
+        let brightness = DisplayBrightnessService.shared.currentBrightness
+        XCTAssertGreaterThanOrEqual(brightness, 0.0)
+        XCTAssertLessThanOrEqual(brightness, 1.0)
+    }
+
+    func testBatteryMonitorCalculation() throws {
         let monitor = BatteryMonitorService.shared
         monitor.refresh()
         XCTAssertGreaterThanOrEqual(monitor.percentage, 0)
         XCTAssertLessThanOrEqual(monitor.percentage, 100)
+        XCTAssertFalse(monitor.formattedEstimate.isEmpty)
     }
 }
-

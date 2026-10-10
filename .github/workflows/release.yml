@@ -25,3 +25,4 @@ jobs:
         with:
           files: iJustLikeOrdinary-${{ github.ref_name }}.zip
           generate_release_notes: true
+
