@@ -151,10 +151,10 @@ public final class ProfileManager: ObservableObject {
 
     public var processorLevelName: String {
         switch processorLevel {
-        case 0: return "Super Low (E-Cores)"
-        case 1: return "Low (Power Saver)"
-        case 2: return "Medium (Balanced)"
-        default: return "Normal (Full Speed)"
+        case 0: return "Super Low"
+        case 1: return "Low"
+        case 2: return "Medium"
+        default: return "Normal"
         }
     }
 

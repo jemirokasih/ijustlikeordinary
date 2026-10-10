@@ -136,27 +136,27 @@ public final class BatteryMonitorService: ObservableObject {
                     let h = mins / 60
                     let m = mins % 60
                     if h > 0 {
-                        return "Penuh dalam \(h)j \(m)m"
+                        return "Full in \(h)h \(m)m"
                     } else {
-                        return "Penuh dalam \(m) menit"
+                        return "Full in \(m)m"
                     }
                 } else {
-                    return "Sedang mengisi daya..."
+                    return "Charging..."
                 }
             } else {
-                return "Tersambung (Baterai Penuh)"
+                return "Connected (Fully Charged)"
             }
         } else {
             if let mins = timeToEmptyMinutes {
                 let h = mins / 60
                 let m = mins % 60
                 if h > 0 {
-                    return "\(h) jam \(m) menit lagi"
+                    return "\(h)h \(m)m remaining"
                 } else {
-                    return "\(m) menit lagi"
+                    return "\(m)m remaining"
                 }
             } else {
-                return "Menghitung estimasi..."
+                return "Calculating remaining time..."
             }
         }
     }
