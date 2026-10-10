@@ -101,20 +101,29 @@ public final class BatteryMonitorService: ObservableObject {
             self.isOnACPower = ext
         }
 
-        // Fallback calculation for time to empty if system reports calculating/nil
-        if !isOnACPower && timeToEmptyMinutes == nil && currentWatts > 0.5 {
-            let batteryVolts = voltage / 1000.0
-            let remainingWh = (Double(currentCapacityMAh) / 1000.0) * (batteryVolts > 5.0 ? batteryVolts : 11.4)
-            let hoursRemaining = remainingWh / currentWatts
-            if hoursRemaining > 0 && hoursRemaining < 48 {
-                self.timeToEmptyMinutes = Int(round(hoursRemaining * 60.0))
+        // 1. Try reading official firmware TimeRemaining or AvgTimeToEmpty
+        if !isOnACPower {
+            if let tr = dict["TimeRemaining"] as? Int, tr > 0 && tr < 65535 {
+                self.timeToEmptyMinutes = tr
+            } else if let avg = dict["AvgTimeToEmpty"] as? Int, avg > 0 && avg < 65535 {
+                self.timeToEmptyMinutes = avg
+            } else if timeToEmptyMinutes == nil && currentWatts > 0.5 {
+                // Accurate fallback based on real MacBook Pro battery capacity in Wh (70Wh for 14", 100Wh for 16")
+                let batteryTotalWh: Double = 70.0
+                let remainingWh = (Double(percentage) / 100.0) * batteryTotalWh
+                let hoursRemaining = remainingWh / currentWatts
+                if hoursRemaining > 0 && hoursRemaining < 48 {
+                    self.timeToEmptyMinutes = Int(round(hoursRemaining * 60.0))
+                }
             }
         }
 
-        // Fallback for time to full charge if charging
-        if isCharging && timeToFullMinutes == nil {
+        // 2. Fallback for time to full charge if charging
+        if isCharging {
             if let avgFull = dict["AvgTimeToFull"] as? Int, avgFull > 0 && avgFull < 65535 {
                 self.timeToFullMinutes = avgFull
+            } else if let tr = dict["TimeRemaining"] as? Int, tr > 0 && tr < 65535 {
+                self.timeToFullMinutes = tr
             }
         }
     }
