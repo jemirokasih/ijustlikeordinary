@@ -4,16 +4,23 @@ A native macOS Menu Bar application built in Swift & SwiftUI designed to optimiz
 
 ## Key Features
 
-- **SoC CPU Throttling (Low Power Mode)**: Toggles macOS Low Power Mode to limit clock frequencies on M1 Max P-cores and schedule workloads on high-efficiency E-cores.
-- **Refresh Rate Limiter**: Cuts display refresh rate from ProMotion 120Hz down to 60Hz or 48Hz (cinema rate) using native `CoreGraphics`.
-- **Keyboard Backlight Controller**: Automatically turns off or dims keyboard backlights when saving battery using `CoreBrightness`.
-- **Real-Time Wattage & Battery Gauge**: Reads live battery discharge rate (in Watts, e.g. `8.2W`) directly from `AppleSmartBattery` IOKit.
-- **Menu Bar Tray Native UI**: Runs unobtrusively in the macOS menu bar (`LSUIElement`).
-- **Profile Presets**:
-  - **Ordinary Typing**: 60Hz, Low Power Mode on, Keyboard Backlight off.
-  - **Movie & Stream**: 48Hz cinema rate, Low Power Mode on, Keyboard Backlight off.
-  - **Ultra Saver**: 48Hz, Low Power Mode on, Keyboard Backlight off.
-  - **Full Beast**: 120Hz ProMotion, Low Power Mode off, Keyboard Backlight restored.
+- **Master Ordinary Mode Toggle**: 1-click toggle to instantly drop power consumption across display, CPU, and backlight.
+- **4 Granular Hardware Sliders**:
+  - **Processor Level**: Super Low, Low, Medium, Normal (via macOS Low Power Mode).
+  - **Refresh Rate**: 48Hz (cinema), 50Hz, 60Hz, 120Hz (ProMotion) via native `CoreGraphics`.
+  - **Display Brightness**: 0% – 100% slider using `DisplayServices`.
+  - **Keyboard Backlight**: 0% – 100% slider using `CoreBrightness`.
+- **Optional Presets Dropdown**: Quick selection for *Ordinary Typing*, *Movie & Stream*, *Ultra Saver*, *Full Beast*, or *Custom*.
+- **Accurate Real-Time Battery Calculations**:
+  - Live wattage draw (`W`) and power savings percentage.
+  - Accurate time to empty (hours and minutes remaining on battery).
+  - Time until full charge when plugged into AC power.
+- **Battery Longevity & Health Guard**:
+  - Live health metrics: Maximum Capacity %, Cycle Count, and Battery Condition.
+  - Charge Limit Protection (80% sweet spot to reduce high-voltage chemical wear).
+  - Cool Charging (Thermal Guard) notifications to avoid degradation from charging heat.
+  - Quick link to native macOS Battery Settings.
+- **Native & Unobtrusive**: Pure Swift/SwiftUI running as a lightweight Menu Bar extra (`LSUIElement`). Safe user-space APIs with automatic hardware restoration on exit.
 
 ## Requirements
 
